@@ -4,54 +4,48 @@ import torch.nn as nn
 import torch.nn.functional as tf
 import matplotlib.pyplot as plt
 import datetime
+import load_images as lm
 from torch.utils.tensorboard import SummaryWriter
 
 #variables
-batch_size = 4
+batch_size = 2
 
 #transform all images to same size
 transform = tv.transforms.Compose(
-    [tv.transforms.ToTensor(),
-    tv.transforms.Normalize((0.5,), (0.5,))])
+    [tv.transforms.ToTensor()])
 
 #load data from folder
-#dataset_training = tv.datasets.ImageFolder('.\Pictures', transform=transform)
-# Create datasets for training & validation, download if necessary
-dataset_training = tv.datasets.FashionMNIST('./data', train=True, transform=transform, download=True)
-validation_set = tv.datasets.FashionMNIST('./data', train=False, transform=transform, download=True)
-
-#use dataloader to label and use images
+#training data
+dataset_training = tv.datasets.ImageFolder(root='.\Pictures', transform=transform)
+#dataset_training = tv.datasets.FashionMNIST('./data', train=True, transform=transform, download=True)
 dataloader_training = t.utils.data.DataLoader(dataset_training, batch_size, shuffle = True)
-validation_loader = t.utils.data.DataLoader(validation_set, batch_size, shuffle=False)
 
-#examples = next(iter(dataloader_training))
-#print(len(dataset_training))
-#img, label = examples
-# plt.imshow(img[0].permute(1,2,0))
-# plt.show()
-# print(f"label: {label}")
+#validation data
+#validation_set = tv.datasets.FashionMNIST('./data', train=False, transform=transform, download=True)
+#validation_loader = t.utils.data.DataLoader(validation_set, batch_size, shuffle=False)
 
 # PyTorch models inherit from torch.nn.Module
-class GarmentClassifier(nn.Module):
+class CarClassifier(nn.Module):
     def __init__(self):
-        super(GarmentClassifier, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5)
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 4 * 4, 120)
+        print(self)
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, x):
         x = self.pool(tf.relu(self.conv1(x)))
         x = self.pool(tf.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 4 * 4)
+        x = x.view(-1, 64 * 64)
         x = tf.relu(self.fc1(x))
         x = tf.relu(self.fc2(x))
         x = self.fc3(x)
-        return x
+        return x    
 
-model = GarmentClassifier()
+model = CarClassifier()
 
 loss_fn = nn.CrossEntropyLoss()
 
@@ -95,10 +89,10 @@ def train_one_epoch(epoch_index, tb_writer):
 
 # Initializing in a separate cell so we can easily add more epochs to the same run
 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-writer = SummaryWriter('runs/fashion_trainer_{}'.format(timestamp))
+writer = SummaryWriter('runs/custom_trainer_{}'.format(timestamp))
 epoch_number = 0
 
-EPOCHS = 5
+EPOCHS = 2
 
 best_vloss = 1_000_000.
 
@@ -117,7 +111,7 @@ for epoch in range(EPOCHS):
 
     # Disable gradient computation and reduce memory consumption.
     with t.no_grad():
-        for i, vdata in enumerate(validation_loader):
+        for i, vdata in enumerate(dataloader_training):
             vinputs, vlabels = vdata
             voutputs = model(vinputs)
             vloss = loss_fn(voutputs, vlabels)
