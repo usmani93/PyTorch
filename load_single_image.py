@@ -11,9 +11,7 @@ class LoadImages(Dataset):
 
         #list all images in folder and count them
         all_imgs = os.listdir(main_dir)
-        print(main_dir)
         self.total_images = natsorted(all_imgs)
-        print(self.total_images)
 
     def __len__(self):
         return len(self.total_images)

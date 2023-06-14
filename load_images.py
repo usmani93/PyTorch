@@ -11,6 +11,7 @@ def imshow(sample_element, shape = (64, 64)):
 transform = tv.transforms.Compose(
     [tv.transforms.ToTensor(),
         tv.transforms.Normalize((0.5,), (0.5,)),
+        tv.transforms.Resize(size=(64,64)),
         tv.transforms.Grayscale(1)])
 dataset_training = tv.datasets.ImageFolder(root='.\Pictures', transform=transform)
 dataloader_training = t.utils.data.DataLoader(dataset_training, batch_size=32, shuffle = True)
