@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as tf
 import matplotlib.pyplot as plt
 import datetime
-import load_images as lm
 from torch.utils.tensorboard import SummaryWriter
 
 #variables
@@ -18,7 +17,7 @@ transform = tv.transforms.Compose(
 #training data
 dataset_training = tv.datasets.ImageFolder(root='.\Pictures', transform=transform)
 #dataset_training = tv.datasets.FashionMNIST('./data', train=True, transform=transform, download=True)
-dataloader_training = t.utils.data.DataLoader(dataset_training, batch_size, shuffle = True)
+dataloader_training = t.utils.data.DataLoader(dataset_training, shuffle = True)
 
 #validation data
 #validation_set = tv.datasets.FashionMNIST('./data', train=False, transform=transform, download=True)
@@ -32,7 +31,7 @@ class CarClassifier(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
         print(self)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc1 = nn.Linear(1 * 64 * 64, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
