@@ -1,3 +1,4 @@
+import time 
 import model as m
 import torch as t
 import torchvision as tv
@@ -11,24 +12,35 @@ def imshow(sample_element, shape = (64, 64)):
 transform = tv.transforms.Compose(
     [tv.transforms.ToTensor(),
         tv.transforms.Normalize((0.5,), (0.5,)),
-        tv.transforms.Resize(size=(64,64)),
-        tv.transforms.Grayscale(1)])
+        tv.transforms.Resize(size=(64,64))])
+
+train_load_start = time.time()
 dataset_training = tv.datasets.ImageFolder(root='.\Pictures', transform=transform)
-dataloader_training = t.utils.data.DataLoader(dataset_training, batch_size=32, shuffle = True)
+dataloader_training = t.utils.data.DataLoader(dataset_training, shuffle = True)
+train_load_end = time.time()
+print('Training data loaded in: {} seconds'.format(train_load_end - train_load_start))
 
+validation_load_start = time.time()
 dataset_validation = tv.datasets.ImageFolder(root='.\Validation', transform=transform)
-dataloader_validation = t.utils.data.DataLoader(dataset_validation, batch_size=32, shuffle = False)
+dataloader_validation = t.utils.data.DataLoader(dataset_validation, shuffle = False)
+validation_load_end = time.time()
+print('Validation data loaded in: {} seconds'.format(validation_load_end - validation_load_start))
 
+load_model_start = time.time()
 model = m.MPL()
+load_model_end = time.time()
+print('Loaded model in: {} seconds'.format(load_model_end - load_model_start))
 criterion = t.nn.CrossEntropyLoss()
 optimizer = t.optim.Adam(model.parameters(), lr=0.01)
-num_epochs = 20
+num_epochs = 10
 best_vloss = 1_000_000.
 
 train_loss_history = []
 train_acc_history = []
 val_loss_history = []
 val_acc_history = []
+
+training_started = time.time()
 
 for epoch in range(num_epochs):
     train_loss = 0.0
@@ -68,7 +80,7 @@ for epoch in range(num_epochs):
     val_acc /= len(dataloader_validation.dataset)
     val_acc_history.append(val_acc)
  
-    print(f'Epoch {epoch+1}/{num_epochs}, train loss: {train_loss:.4f}, train acc: {train_acc:.4f}')
+    print(f'Epoch {epoch+1}/{num_epochs}, train l                                         oss: {train_loss:.4f}, train acc: {train_acc:.4f}')
     print(f'val loss: {val_loss:.4f}, val acc: {val_acc:.4f}')
 
     # Track best performance, and save the model's state
@@ -77,6 +89,9 @@ for epoch in range(num_epochs):
         model_path = 'model_{}_{}'.format('1', epoch)
         t.save(model.state_dict(), model_path)
 
+training_ended = time.time()
+total_train_time = training_ended - training_started
+print('Training took {} seconds for {} cycles'.format(total_train_time, num_epochs))
 # Plot the training and validation loss
 plt.plot(train_loss_history, label='train loss')
 plt.plot(val_loss_history, label='val loss')
