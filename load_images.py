@@ -11,8 +11,7 @@ def imshow(sample_element, shape = (64, 64)):
     
 transform = tv.transforms.Compose(
     [tv.transforms.ToTensor(),
-        tv.transforms.Normalize((0.5,), (0.5,)),
-        tv.transforms.Resize(size=(64,64))])
+     tv.transforms.Normalize((0.5,), (0.5,))])
 
 train_load_start = time.time()
 dataset_training = tv.datasets.ImageFolder(root='.\Pictures', transform=transform)
@@ -32,7 +31,7 @@ load_model_end = time.time()
 print('Loaded model in: {} seconds'.format(load_model_end - load_model_start))
 criterion = t.nn.CrossEntropyLoss()
 optimizer = t.optim.Adam(model.parameters(), lr=0.01)
-num_epochs = 10
+num_epochs = 1
 best_vloss = 1_000_000.
 
 train_loss_history = []
@@ -43,12 +42,14 @@ val_acc_history = []
 training_started = time.time()
 
 for epoch in range(num_epochs):
+    print(f'Starting epoch: {epoch+1}')
     train_loss = 0.0
     train_acc = 0.0
     val_loss = 0.0
     val_acc = 0.0
 
     model.train()
+    print('Model set to train')
     
     for inputs, labels in dataloader_training:
         optimizer.zero_grad()
@@ -67,13 +68,14 @@ for epoch in range(num_epochs):
  
     #set the model to evaluation mode
     model.eval()
+    print('Model set to evaluate')
     with t.no_grad():
         for inputs, labels in dataloader_validation:
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             val_loss += loss.item()
             val_acc += (outputs.argmax(1) == labels).sum().item()
- 
+            
     # calculate the average validation loss and accuracy
     val_loss /= len(dataloader_validation)
     val_loss_history.append(val_loss)
