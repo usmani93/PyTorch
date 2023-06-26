@@ -1,11 +1,11 @@
 import torch as t
 
 class MPL(t.nn.Module):
-    def __init__(self):
-        super().__init__()
+    def __init__(self,):
+        super(MPL, self).__init__()
         self.fc1 = t.nn.Linear(64*64*3, 512)
-        self.fc2 = t.nn.Linear(512,512)
-        self.fc3 = t.nn.Linear(512,10)
+        self.fc2 = t.nn.Linear(512, 100)
+        self.fc3 = t.nn.Linear(100, 10)
 
         # self.flatten = t.nn.Flatten()
         # self.linear_relu_stack = t.nn.Sequential(
@@ -22,8 +22,16 @@ class MPL(t.nn.Module):
         x = self.fc2(x)
         x = t.relu(x)
         x = self.fc3(x)
-        x = t.relu(x)
         return x
         # x = self.flatten(x)
         # logits = self.linear_relu_stack(x)
         # return logits
+
+    # def __getitem__(self, index):
+    #     image = self.tensors[0][index]
+    #     label = self.tensors[1][index]
+    #     bbox = self.tensors[2][index]
+
+    #     image = image.permute(2, 0, 1)
+
+    #     return (image, label, bbox)

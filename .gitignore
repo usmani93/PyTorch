@@ -1,7 +1,7 @@
 
 final
-model*
 runs/*
+*.jpg
 __pycache__/load_images.cpython-310.pyc
 custom_model
 Pictures/*
@@ -9,3 +9,4 @@ Validation/*
 Single/*
 __pycache__/*
 custom_model(old)
+custom_model1

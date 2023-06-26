@@ -11,6 +11,7 @@ def imshow(sample_element, shape = (64, 64)):
     
 transform = tv.transforms.Compose(
     [tv.transforms.ToTensor(),
+     tv.transforms.Resize(size=(64,64)),
      tv.transforms.Normalize((0.5,), (0.5,))])
 
 train_load_start = time.time()
